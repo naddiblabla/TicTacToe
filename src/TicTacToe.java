@@ -46,12 +46,12 @@ public class TicTacToe {
 		while(true) {
 			try {
 				int input = Integer.parseInt(scanner.nextLine());
-				if (input > 0 && input < 10 && board[(int) Math.floor((input-1)/3)][(input-1)%3] == "-") {
-					return input;
+				if (input <= 0 || input > 9) {
+					throw new NumberFormatException();
 				} else if (board[(int) Math.floor((input-1)/3)][(input-1)%3] != "-") {
 					System.out.println("You can not override another player's move.");
 				} else {
-					throw new NumberFormatException();
+					return input;
 				}
 			}
 			catch (NumberFormatException e){
