@@ -1,62 +1,81 @@
 import java.util.Scanner;
 
 public class TicTacToe {
-	static String[][] board = new String[3][3];
-	static Player player1;
-	static Player player2;
+	final String[][] board = new String[3][3];
+	Player player1;
+	Player player2;
 	
 	public static void main(String[] args) {
-		player1 = new Player();
-		player2 = new Player();
-		
+		TicTacToe ticTacToe = new TicTacToe();
+		ticTacToe.run();
+	}
+	
+	public void run() {
+		fillBoard();
 		Scanner input = new Scanner(System.in);  // Create a Scanner object
 		
 		System.out.println("Enter player1's name:");
-	    player1.name = input.next();
-	    System.out.println("Enter player2's name:");
-	    player2.name = input.next();
+		player1 = new Player(input.next());
+		System.out.println("Enter player2's name:");
+		player2 = new Player(input.next());
 	    
 	    Player currentPlayer = player1;
 		int chosenMove;  // move with value 1-9
 		int round = 1;
-	    boolean successfulRound = true;  // true if no errors last iteration
 	    while(true) {
-	    	if (successfulRound) {
-	    		System.out.println("\nx------------------ ROUND " + round + " ------------------x\n" +
-	    						   currentPlayer.name + ", Where do you want to place your move, 1-9?");
+	    	System.out.println("\nx-------------------- ROUND " + round + " --------------------x\n" +
+	    					   currentPlayer.getName() + ", Where do you want to place your move, 1-9?");
+			chosenMove = getInput(input);
+			changeBoard(chosenMove, currentPlayer);
+			printBoard();
+	    	if (checkForWin(currentPlayer)) {
+	    		System.out.println(currentPlayer.getName() + ", won the game. Congratulations!");
+	    		break;  // game over
 	    	}
+	    	if (round >= 9) {
+	    		System.out.println("It's a tie!");
+	    		break;  // game over
+	    	}
+	    	currentPlayer = changePlayer(currentPlayer);
+	    	round++;
+		}
+		input.close();
+	}
+	
+	public int getInput(Scanner scanner) {
+		while(true) {
 			try {
-				chosenMove = Integer.parseInt(input.nextLine());
-				if (chosenMove > 0 && chosenMove < 10) {
-					changeBoard(chosenMove, currentPlayer);
-					printBoard();
-			    	if (checkForWin(currentPlayer)) {
-			    		System.out.println(currentPlayer.name + ", won the game. Congratulations!");
-			    		break;  // game over
-			    	}
-			    	currentPlayer = changePlayer(currentPlayer);
-			    	round++;
-					successfulRound = true;
+				int input = Integer.parseInt(scanner.nextLine());
+				if (input > 0 && input < 10 && board[(int) Math.floor((input-1)/3)][(input-1)%3] == "-") {
+					return input;
+				} else if (board[(int) Math.floor((input-1)/3)][(input-1)%3] != "-") {
+					System.out.println("You can not override another player's move.");
 				} else {
 					throw new NumberFormatException();
 				}
 			}
 			catch (NumberFormatException e){
 				System.out.println("Type a number 1-9.");
-				successfulRound = false;
 			}
-	    }
-		input.close();	    
+		}
 	}
 	
-	public static Player changePlayer(Player player) {
+	public void fillBoard() {
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board.length; j++) {
+				board[i][j] = "-";
+			}
+		}
+	}
+	
+	public Player changePlayer(Player player) {
 		if (player == player1) {
 			return player2;
 		}
 		return player1;
 	}
 	
-	public static void changeBoard(int move, Player player) {
+	public void changeBoard(int move, Player player) {
 		if(player == player1) {
 			board[(int) Math.floor((move-1)/3)][(move-1)%3] = "X";
 		} else {
@@ -64,7 +83,7 @@ public class TicTacToe {
 		}
 	}
 	
-	public static boolean checkForWin(Player player) {
+	public boolean checkForWin(Player player) {
 		String turn;
 		if (player == player1) {
 			turn = "X";
@@ -74,7 +93,7 @@ public class TicTacToe {
 		
 		boolean win = false;
 		// three in a row horizontally and vertically
-		for (int i = 0; i<board.length; i++) {
+		for (int i = 0; i < board.length; i++) {
 			if ((board[i][0] == turn && board[i][1] == turn && board[i][2] == turn) ||
 				(board[0][i] == turn && board[1][i] == turn && board[2][i] == turn)) {
 				win = true;
@@ -88,20 +107,12 @@ public class TicTacToe {
 		return win;
 	}
 
-	public static void printBoard() {
-		int count = 1;
+	public void printBoard() {
 		for(int i=0; i<3; i++) {
 			for(int j=0; j<3; j++) {
-				if (board[i][j] == null) {
-					System.out.print("- ");  // prints '-' if not played at.
-				} else {
-					System.out.print(board[i][j] + " ");
-				}
-				if (count%3 == 0) {  // making a 3x3 board
-					System.out.println("");
-				}
-				count++;
+				System.out.print(board[i][j] + " ");
 			}
+			System.out.println("");
 		}
 	}
 }

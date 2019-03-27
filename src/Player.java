@@ -1,11 +1,11 @@
 public class Player {
-	public String name;
+	final String name;
 	
-	public Player() {
-		this.name = "player";
+	public Player(String name) {
+		this.name = name;
 	}
 	
-	public Player(String n) {
-		this.name = n;
+	public String getName() {
+		return name;
 	}
 }
